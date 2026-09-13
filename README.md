@@ -108,3 +108,28 @@ No token-savings percentage is claimed. The specification prohibits asserting on
 ---
 
 ## Repository structure
+/spec The CLL v1.2 corpus — 12 documents, the source of truth
+/logs Development logs 001–007 with the full benchmark evidence
+/examples Working CoS examples with their inputs and outputs
+
+The **compiler and validator are not in this repository.** They live in a separate private repo. What is published here is the language itself: its specification, the evidence behind its design, and worked examples.
+
+---
+
+## Status
+
+The corpus is at **v1.2** and stable, and it will keep moving — the specification advances as the benchmark produces evidence. Open design questions are marked inside the documents rather than hidden. One is currently open: how the GLOBAL section should recognize variable declarations (positional enforcement vs. an explicit container). It surfaced during testing and is recorded in the Grammar.
+
+---
+
+## Author
+
+CLL was designed and developed by **Zito Moreno** ([@ZitoMorenoTech](https://github.com/ZitoMorenoTech)).
+
+---
+
+## License and intended use
+
+Licensed under [Apache 2.0](./LICENSE) — permissive, with a patent grant.
+
+The license governs what you may legally do. [`PRINCIPLES.md`](./PRINCIPLES.md) states what CLL was built for and where the author stands on uses he did not intend. It carries no legal force; it exists because a license controls the terms of use, not the use itself.
