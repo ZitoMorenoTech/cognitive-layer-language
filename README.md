@@ -1,4 +1,4 @@
-<img width="1920" height="1032" alt="image" src="https://github.com/user-attachments/assets/a661056d-baf9-4e56-a10c-c98819821922" /># Cognitive Layer Language (CLL)
+# Cognitive Layer Language (CLL)
 
 **CLL makes the output predictable where the task is ambiguous. Where the model already knows the shape, CLL stays out of the way.**
 
