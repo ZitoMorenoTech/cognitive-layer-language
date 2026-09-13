@@ -46,4 +46,65 @@ Out-Lang: Natural
 
 The verb in `Act:` comes from a closed registry and determines the block type: **Declarative** verbs (`Define`, `Enforce`, `Preserve`…) set a rule and produce no output; **Executable** verbs (`Build`, `Generate`, `Compare`…) produce output. Verbs cannot be invented — an unregistered verb is invalid.
 
-Blocks are packaged into a **CoS** (Cognitive Operating System) — META for the label,
+Blocks are packaged into a **CoS** (Cognitive Operating System) — META for the label, GLOBAL for shared values and standing rules, then the modules:
+
+```cll
+# META
+Ver: 1.2 Dom:Doc Auth:Zito Date:2026-09
+
+# GLOBAL
+Var: OutLang = "es"
+
+Int: A-Analys SourceScope
+Ctx: D-Data InputOnly
+Cfg: C-Konfig Domain:Doc AddKnowledge:FALSE
+Act: X-Exec Enforce
+
+# MODULE 1
+Int: A-Analys BookCard
+Ctx: D-Data UserText Lang:$OutLang
+Cfg: C-Konfig Domain:Doc Fields:7
+Act: X-Exec Build
+Out-Lang: Natural
+```
+
+Two mechanisms sit on top: the **Global Variable System** — declare a value once with `Var:`, reference it with `$Name` — and **Literal Preservation**, where content wrapped in `***Literal***` markers passes through byte-for-byte with the grammar switched off.
+
+Full specification in [`/spec`](./spec). Start with the [Overview & Reading Guide](./spec/00__CLL_Overview_and_Reading_Guide_v1_2.md).
+
+---
+
+## What the benchmark shows
+
+Twelve runs across five domains (book card, recipe extraction, technical article, option comparison, translation), executed via API in cold-call mode with no conversational context. Conformity is measured on two independent axes: **structure** (was the form respected?) and **context** (was the content and its constraints respected?).
+
+**Design phase — seven findings, each isolating one variable:**
+
+| Discovery | Effect |
+|---|---|
+| Fuse the label with its physical line position | ~50% → 83% |
+| Global Variable System | +6% global, +8% context |
+| Write the CoS in English, whatever the output language | +9% global, +20% context |
+| Quantitative limits as global variables | sentence limit went from 0/3 to 6/6 |
+| Short precise CoS beats long complete CoS | 5 blocks > 8 blocks |
+| Rule wording alone — imperative, self-limiting, verifiable | 9 points |
+| Passing through the compiler | +9%, same model and inputs |
+
+**Reliability:** ten runs of the same CoS and input produced a coefficient of variation of **3.6%** (range 89–100%). The structure axis was near-deterministic — one real failure in ten runs. That consistency, not the peak score, is the claim: CLL compresses dispersion.
+
+**Two axes, two mechanisms.** Structure is mechanically verifiable and belongs in a validator. Context depends on judgment and is reported as a band. Log 007 demonstrates this live: the same evaluator scoring the same data twice disagreed on four cells, *all* of them on the context axis.
+
+Full evidence — inputs, CoS, raw outputs and rule-by-rule scoring — in [`/logs`](./logs). Consolidated in the [Executive Summary](./logs/CLL_Executive_Summary_v2.md).
+
+### What the benchmark does not show
+
+- **Small sample.** Three inputs per domain. Enough for design exploration, not for statistical significance.
+- **The conditional map has only its two extremes measured** against a control. Three domains in the middle are missing.
+- **Variance is measured in a single domain.** The low CV still needs confirming where CLL contributes most.
+- **Claims are model-generation specific.** A result measured on one generation is a historical fact, not a present guarantee ([doc 05](./spec/05__CLL_Model_Compatibility_Note_v1_1.md)).
+
+No token-savings percentage is claimed. The specification prohibits asserting one without per-tokenizer measurement, and that measurement has not been done.
+
+---
+
+## Repository structure
