@@ -1,34 +1,49 @@
-# CLL Specification — Corpus v1.2
+# Cognitive Layer Language (CLL)
 
-The normative definition of the Cognitive Layer Language. **This corpus is the single source of truth**: where a document here and any other material disagree, this corpus wins.
+**CLL makes the output predictable where the task is ambiguous. Where the model already knows the shape, CLL stays out of the way.**
 
-New to CLL? Read [`00__CLL_Overview_and_Reading_Guide_v1_2.md`](./00__CLL_Overview_and_Reading_Guide_v1_2.md) first. It explains the whole system in plain language and points to where each idea is defined precisely.
-
----
-
-## Documents
-
-| # | Document | Read it when you want to… |
-|---|---|---|
-| 00 | [Overview & Reading Guide](./00__CLL_Overview_and_Reading_Guide_v1_2.md) | get the whole picture fast |
-| 01 | [Core Architecture](./01__CLL_Core_Architecture_v1_2.md) | understand the concepts and the five layers |
-| 01_1 | [UR→CM Compression Algorithm](./01_1_CLL_UR_CM_Compression_Algorithm_v1_2.md) | understand how roots compress to compact forms |
-| 01_2 | [Canonical Dictionary](./01_2_CLL_Canonical_Dictionary_v1_2.md) | look up a root and its compact form |
-| 02 | [SPEC](./02__CLL-SPEC-v1_2.md) | know the exact rules and constraints |
-| 03 | [Grammar](./03__CLL-Grammar-v1_2.md) | know the precise syntax (BNF) |
-| 04 | [Style Guide](./04__CLL-Style-Guide-v1_2.md) | write clean, consistent CLL |
-| 05 | [Model Compatibility Note](./05__CLL_Model_Compatibility_Note_v1_1.md) | understand how claims are scoped and benchmarked |
-| 06 | [Literal Preservation Spec](./06__CLL_Literal_Preservation_Spec_v1_2.md) | keep content verbatim (templates, code, embedded DSLs) |
-| 07 | [Action Verb Registry](./07__CLL_Action_Verb_Registry_v1_2.md) | see which verbs are legal in an `Act:` line |
-| 08 | [CoS Container & Inheritance](./08__CLL_CoS_Container_and_Inheritance_v1_2.md) | package blocks into a CoS, or inherit from a base |
-| 09 | [Global Variable System](./09__CLL_Global_Variable_System_v1_2.md) | declare and reuse values with `Var:` and `$Name` |
-
-**Shortest path to writing CLL:** 00 → 01 → 07 → 08. Add 09 and 06 when you need them; reach for 02 and 03 when you need the letter of the law.
+CLL is a formal language for writing instructions to an LLM as **labeled layers** instead of free prose. Prose is re-interpreted on every run; a labeled structure is read the same way every time. The result is output whose *shape* is stable across runs and inputs — and mechanically verifiable afterwards.
 
 ---
 
-## Two things to know before reading
+## The finding that defines the scope
 
-**On claims.** CLL's efficiency claim is *convergence efficiency* — fewer iterations to reach a standardized, acceptable output — measured per model and per provider. Flat token-reduction percentages are explicitly prohibited without per-tokenizer measurement (SPEC §9).
+CLL was benchmarked against a control group: the same inputs run with a plain natural-language prompt — what a user unfamiliar with CLL would type. The result is not a flat number. It depends entirely on the task:
 
-**On the corpus and the runtime.** These documents are the specification. The runtime that executes CLL is a separate build maintained in a private repository, and the two are decoupled on purpose so documentation can improve without cascading into running tooling. Where a document notes a difference between the two, it is marked as a *Kernel Conformance Gap* box and labelled informative — it records an implementation lag, not a change to the specification.
+| Domain | Control (plain prose) | Best CLL | Delta |
+|---|---|---|---|
+| Translation | 96% | 92% | **−4%** |
+| Option comparison | 24% | 92% | **+68%** |
+
+**The value of CLL is a function of the task's structural ambiguity, not its difficulty.**
+
+In translation the model already knows the output mirrors the input — the scaffolding is noise, and CLL slightly hurts. In option comparison the model does not know whether to use a table, prose or bullets, how many criteria, in what order, or where to put the recommendation, so it improvises differently every time (24%). There CLL is worth +68 points.
+
+This answers the obvious objection in advance. *Isn't this just a good prompt?* A good prompt **describes** the output. CLL **declares** the structure before the model decides, and verifies it afterwards. Where the task has a natural shape that difference is worth nothing; where it doesn't, it's worth 68 points.
+
+---
+
+## How it works
+
+The unit is a **block**: five layers, always the same, always in order.
+
+| Layer | Question it answers |
+|---|---|
+| `Int:` | **What** is the goal? |
+| `Ctx:` | **With what** inputs? |
+| `Cfg:` | **How** — which settings? |
+| `Act:` | **Do** what action? |
+| `Out-Lang:` | **Deliver** in what form? |
+
+```cll
+CLL: 1.2
+Int: A-Analys Kontext
+Ctx: D-Data UserReq
+Cfg: C-Konfig Tone:Neutral Len:Short
+Act: X-Exec Build
+Out-Lang: Natural
+```
+
+The verb in `Act:` comes from a closed registry and determines the block type: **Declarative** verbs (`Define`, `Enforce`, `Preserve`…) set a rule and produce no output; **Executable** verbs (`Build`, `Generate`, `Compare`…) produce output. Verbs cannot be invented — an unregistered verb is invalid.
+
+Blocks are packaged into a **CoS** (Cognitive Operating System) — META for the label,
