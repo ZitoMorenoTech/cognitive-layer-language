@@ -1,4 +1,4 @@
-# Cognitive Layer Language (CLL)
+<img width="1920" height="1032" alt="image" src="https://github.com/user-attachments/assets/a661056d-baf9-4e56-a10c-c98819821922" /># Cognitive Layer Language (CLL)
 
 **CLL makes the output predictable where the task is ambiguous. Where the model already knows the shape, CLL stays out of the way.**
 
@@ -108,10 +108,11 @@ No token-savings percentage is claimed. The specification prohibits asserting on
 ---
 
 ## Repository structure
-[`/spec`]      The CLL v1.2 corpus — 12 documents, the source of truth
-[`/logs`]      Development logs 001–007 with the full benchmark evidence
-[`/examples`]  Working CoS examples with their inputs and outputs
-
+```
+/spec The CLL v1.2 corpus — 12 documents, the source of truth
+/logs Development logs 001–007 with the full benchmark evidence
+/examples Working CoS examples with their inputs and outputs
+```
 The **compiler and validator are not in this repository.** They live in a separate private repo. What is published here is the language itself: its specification, the evidence behind its design, and worked examples.
 
 ---
