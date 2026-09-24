@@ -1,11 +1,17 @@
-# CLL Style Guide v1.2
+# CLL Style Guide v2.0
 **Authoritative Style and Writing Conventions for CLL**
 
 > Normative values: this corpus (single source of truth); `cll_norms.json` planned.
 
-**Changes vs v1.1:**
-- Companion-document list updated: new docs 07 (AVR), 08 (CoS Container), 09 (GVS); Literal Preservation is now formalized (doc 06 v1.2); validator range corrected to V1–V18.
-- Style sections added for AVR verbs (§4.5 / §5.6), Variables (§6a), TypedValues (§6b), Literal Preservation (§11), and the closed line-key set (§9.10).
+**Version note (v1.2 → v2.0):** updated for the `***Global***` container. §6a
+(Variable Style) now uses the container; a new best practice (§9.11) forbids
+declaring `Var:` outside it.
+
+**Changes vs v1.2:**
+- §6a rewritten: variables are declared inside `***Global***`, with formal and
+  natural authoring modes.
+- §9.11 added: one `***Global***` container per CoS; never declare `Var:` outside it.
+- Companion-document list aligned to v2.0.
 
 ## 1. Purpose
 
@@ -13,27 +19,27 @@ Writing conventions, formatting rules and best practices for consistent,
 readable, stable CLL blocks across users, domains and implementations.
 
 **Companion documents:**
-- CLL-Core Architecture v1.2 (conceptual foundation)
-- CLL-SPEC v1.2 (technical rules)
-- CLL-Grammar v1.2 (formal syntax)
-- UR→CM Algorithm v1.2 + Canonical Dictionary v1.2 (lexicon)
-- Action Verb Registry (doc 07)
-- CoS Container & Inheritance (doc 08)
-- Global Variable System (doc 09)
-- Literal Preservation v1.2 (doc 06)
-- Model Compatibility Note (doc 05)
-- CLL Validator v1.2.1 (V1–V13 critical, V14–V18 extended)
+- CLL-Core Architecture v2.0 (conceptual foundation)
+- CLL-SPEC v2.0 (technical rules)
+- CLL-Grammar v2.0 (formal syntax)
+- UR→CM Algorithm v2.0 + Canonical Dictionary v2.0 (lexicon)
+- Action Verb Registry v2.0 (doc 07)
+- CoS Container & Inheritance v2.0 (doc 08)
+- Global Variable System v2.0 (doc 09)
+- Literal Preservation v2.0 (doc 06)
+- Model Compatibility Note v2.0 (doc 05)
+- CLL Validator v2.0 (V1–V13 + V17 critical, V14–V16 + V18 extended)
 
 ## 2. General Principles
 
 - **2.1 Clarity over compression** — prefer Standard Mode unless Compact Mode is explicitly needed.
 - **2.2** One concept per token.
 - **2.3 Predictability** — same order, spacing and token structure, always.
-- **2.4 Minimal natural language** — only inside quotes, only when required.
+- **2.4 Minimal natural language** — only inside quotes, Literal bodies, or a natural-mode `***Global***` body; only when required.
 - **2.5 Determinism** — a CLL block should produce the same cognitive behavior (on the same model generation; see doc 05).
-- **2.6 Declare the version** — start new blocks with `CLL: 1.2`.
+- **2.6 Declare the version** — start new blocks with `CLL: 2.0`.
 - **2.7 Block-type awareness** — know whether you are writing a Declarative or Executable block before you write it.
-- **2.8 Variable reuse** — if a value appears in 2+ modules, extract it to a `Var`.
+- **2.8 Variable reuse** — if a value appears in 2+ modules, extract it to a `Var` inside `***Global***`.
 - **2.9 Closed line-key set** — the seven keys are the ONLY valid block-line prefixes; never invent new ones.
 
 ## 3. Formatting Rules
@@ -65,11 +71,17 @@ readable, stable CLL blocks across users, domains and implementations.
 - No underscores or hyphens in parameter names.
 - Recommended order: `Tone` → `Length` → `Domain` → `Mode` → `Detail`.
 
-### 6a. Variable Style (New in v1.2)
-- `Var: PascalName = <Value>`, declared in the GLOBAL section, 2–12 chars, descriptive but concise (`Pure`, `Hybrid`, `ARRThr`).
+### 6a. Variable Style (v2.0)
+- Declare all globals inside a single `***Global***` … `***End Global***`
+  container. Group it under a `# GLOBAL` comment label for readability.
+- **Formal mode:** `Var: PascalName = <Value>` lines (2–12 chars; `Pure`,
+  `Hybrid`, `ARRThr`). Prefer this for authored/reviewed CoS.
+- **Natural mode:** free text describing the values; the executing model resolves
+  it to `Var:` lines before execution. Use this for end-user input. Don't mix a
+  half-formal, half-natural body — pick one mode per container.
 - Reference with `$Name` in `Ctx`/`Cfg` lines. Read-only. See doc 09.
 
-### 6b. TypedValue Style (New in v1.2)
+### 6b. TypedValue Style
 - Thresholds with comparators: `ARRThr:>20%`, `GMThr:>=70%`.
 - Ranges with a hyphen: `EVRange:10-20x`.
 
@@ -105,6 +117,7 @@ PascalCase, 2–12 characters (`Pure`, `ARRThr`; not `T` or `MyVeryLongVariableN
 - **9.6** Never invent CM forms inline; propose missing roots through the dictionary lifecycle.
 - **9.7** Include META in every CoS (doc 08).
 - **9.8** Reach for Literals only when native CLL cannot express the content (doc 06) — every Literal adds opacity the AI cannot reason about.
+- **9.11** One `***Global***` container per CoS; never declare `Var:` outside it (validator V17).
 
 ### 9.10 Never invent line keys
 The valid line keys are closed: `Int`, `Ctx`, `Cfg`, `Act`, `Out-Lang`, `Out`, `Var`.
@@ -128,9 +141,12 @@ The structured tokens already encode the rule (`Act:X-Exe Enf` + `Cfg:Req:TRUE B
 ### 10.1 Standard (Recommended)
 
 ```cll
-CLL: 1.2
+CLL: 2.0
+***Global***
+Var: OutLang = "Spanish"
+***End Global***
 Int: A-Analys Kontext
-Ctx: D-Data UserReq
+Ctx: D-Data UserReq Lang:$OutLang
 Cfg: C-Konfig Tone:Neutral Len:Short Domain:Email
 Act: X-Exec Build
 Out-Lang: Natural
@@ -139,7 +155,7 @@ Out-Lang: Natural
 ### 10.2 Compact (High Compression)
 
 ```cll
-CLL: 1.2
+CLL: 2.0
 Int: A-Aly Kntx
 Ctx: D-Dta Req
 Cfg: C-Kfg Tn:Ntrl Ln:S Dom:Email
@@ -147,12 +163,13 @@ Act: X-Exe Bld
 Out: Nat
 ```
 
-## 11. Literal Preservation Style (New in v1.2)
+## 11. Literal Preservation Style
 
 - Governing block immediately precedes `***Literal***`; no blank line between them.
 - Governing `Cfg:` MUST contain `Format:Literal`; default `Act:` verb is `Preserve` (`Prs`).
 - Markers on their own lines; indentation inside the literal is preserved as-is.
 - Works identically in Standard and Compact modes; the payload is mode-agnostic.
+- `***Literal***` and `***Global***` are sibling containers; never nest one in the other.
 
 ---
-*End of CLL Style Guide v1.2*
+*End of CLL Style Guide v2.0*

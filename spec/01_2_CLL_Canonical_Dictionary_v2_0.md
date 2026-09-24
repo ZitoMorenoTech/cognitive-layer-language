@@ -1,4 +1,4 @@
-# CLL Canonical Dictionary — Formal Specification v1.2
+# CLL Canonical Dictionary — Formal Specification v2.0
 
 | | |
 |---|---|
@@ -6,19 +6,21 @@
 | **Scope** | Universal Roots (UR), Compact Mode (CM), Semantic Definitions |
 | **Normative values** | This corpus (see note). A machine-readable `cll_norms.json` extract is planned as the build-time source for tooling (Roadmap, Track A). Until built, the values here are normative. |
 
-**Changes vs v1.1:**
-- Version aligned to the v1.2 corpus.
-- **`Variable | Vr` added (Approved, #51).** Supports the Global Variable System (GVS, doc 09). Registered `(R)` reduction of `Variable` (strict `Vrbl` → registered `Vr`); conforms to the Subsequence Conformance Rule.
-- **`Rating` explicitly REJECTED (never admitted).** Same rationale that deprecated `Rate` (§2): semantic overlap with `Score` (evaluation) and `Priorit` (prioritization). Use `Score` or `Priorit`. See §2 and entry #48.
-- **§6 added — UR ↔ AVR namespace note.** Some CM forms are shared between a UR here and an AVR verb (doc 07); disambiguation is positional (see Algorithm v1.2, §8).
-- **Canonical names retained** over the runtime kernel's short forms: `Validate|Vld` (kernel `Valid|Vld`), `ValidateParam|Vp` (kernel `ValidParam|Vp`), `ValidateCtx|Vctx` (kernel `ValidCtx|Vcxt`). See the Kernel Conformance Gap.
+**Version note (v1.2 → v2.0):** version aligned to the v2.0 corpus. **No lexicon
+change.** The `***Global***` container (Grammar v2.0 §5.8) uses the `Var:` line
+key and `$` references, which are independent of this dictionary; the
+`Variable | Vr` entry (#51) is unchanged. This is a header-aligned reissue.
 
-> **Kernel Conformance Gap (informative).** The synthesized runtime kernel (`CLL-Kernel_v1_2_1`) diverges from this canonical dictionary on machine-relevant points, each of which touches `cll_validator.py` (hard-coded `COMPACT_ROOTS` / AVR list), `cll_compiler.py`, and possibly stored CoS in `rules.db`:
-> 1. Kernel ships `Rating|Rtg` (Approved) — **remove** on migration; grep `rules.db` for `Rtg`/`Rating` first.
-> 2. Kernel uses `Valid|Vld`, `ValidParam|Vp`, `ValidCtx|Vcxt` — **rename** to canonical `Validate|Vld`, `ValidateParam|Vp`, `ValidateCtx|Vctx`.
-> 3. Kernel omits `Variable|Vr` — **add** when the GVS is exercised at runtime.
->
-> These are migrated on the kernel side only when the per-provider regression suite is re-run (doc 05). This corpus is not blocked on that migration.
+**Retained from v1.2:**
+- `Variable | Vr` (Approved, #51) supports the Global Variable System (doc 09).
+- `Rating` explicitly REJECTED (never admitted). Use `Score` or `Priorit`.
+- §6 UR ↔ AVR namespace note (positional disambiguation).
+
+> **Kernel Conformance Gap (informative).** The runtime kernel still ships
+> `Rating|Rtg` (remove on migration), uses `Valid|Vld`/`ValidParam|Vp`/
+> `ValidCtx|Vcxt` (rename to canonical `Validate`/`ValidateParam`/`ValidateCtx`),
+> and omits `Variable|Vr` (add when the GVS is exercised). Migrated on the kernel
+> side only when the per-provider regression suite is re-run (doc 05).
 
 ## 1. Entry Structure
 
@@ -43,7 +45,7 @@ excluded on this basis, both in the scoring/prioritization space:
 - `Rate` — **Deprecated v1.1** (overlaps `Score` / `Priorit`).
 - `Rating` — **Rejected v1.2**, never admitted (same overlap; appears only as runtime-kernel drift, see the Kernel Conformance Gap).
 
-## 3. Canonical Dictionary Entries v1.2
+## 3. Canonical Dictionary Entries
 
 | # | StandardUR | CM | Definition | Origin | State:Version | Flags |
 |---:|---|---|---|---|---|---|
@@ -122,14 +124,14 @@ New URs must: pass `Compress(UR)` or register a Minimality reduction;
 produce a unique CM; pass the Subsequence Conformance Rule; fit a
 semantic domain without overlap; enter as Proposed.
 
-## 6. UR ↔ AVR Namespace Note (New in v1.2)
+## 6. UR ↔ AVR Namespace Note
 
 A CM string may be shared between a UR in this dictionary and an AVR verb
 (doc 07) — e.g. `Smr` (UR `Summar` / verb `Summarize`), `Vld` (UR
 `Validate` / verb `Validate`). This is intended reuse, not a collision.
 Disambiguation is **positional**: the second token of an `Act:` line is an
 AVR verb; the same string anywhere else is a UR (full rule in Algorithm
-v1.2, §8). Validators MUST NOT flag the shared CM as a duplicate.
+v2.0, §8). Validators MUST NOT flag the shared CM as a duplicate.
 
 ---
 *End of file.*

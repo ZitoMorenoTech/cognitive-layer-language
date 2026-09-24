@@ -1,4 +1,4 @@
-# CLL UR→CM Compression Algorithm — Formal Specification v1.2
+# CLL UR→CM Compression Algorithm — Formal Specification v2.0
 
 | | |
 |---|---|
@@ -6,13 +6,21 @@
 | **Scope** | Morphological Compression Rules for Universal Roots (UR) |
 | **Normative values** | This corpus (see note below). A machine-readable `cll_norms.json` extract is planned as the build-time source for tooling (Roadmap, Track A). Until it is built, the values stated in this corpus are normative. |
 
-**Changes vs v1.1:**
-- Version aligned to the v1.2 corpus. **No morphological rule changed:** the v1.1 algorithm was already ahead of the runtime kernel (it removed the structural-consonant whitelist, unified UR length to 3–13, prohibited digits, added duplicate-collapse and the Subsequence Conformance Rule). That work is retained in substance.
-- §7 added: **AVR verb CM forms** (Action Verb Registry, doc 07) are registered forms and MUST satisfy the Subsequence Conformance Rule (§6). A worked check for the 14 core verbs is included.
-- §8 added: **UR ↔ AVR namespace note** — some CM forms are shared between a dictionary UR and an AVR verb (`Smr` = UR `Summar` and verb `Summarize`; `Vld` = UR `Validate` and verb `Validate`). Disambiguation is **positional** (the 2nd token of an `Act:` line is an AVR verb; the same string elsewhere is a UR).
-- **Normative-values note reframed:** the corpus is the source of truth for the specification; `cll_norms.json` is a downstream machine-readable extract that tooling will consume once built. The runtime kernel is NOT edited in lockstep with this corpus (see the Kernel Conformance Gap in the Dictionary and SPEC).
+**Version note (v1.2 → v2.0):** version aligned to the v2.0 corpus. **No
+morphological rule changed** — the `***Global***` container (Grammar v2.0 §5.8)
+does not affect UR→CM compression, which operates on roots, not on the GLOBAL
+section. This document is a header-aligned reissue.
 
-> **Kernel Conformance Gap (informative).** The synthesized runtime kernel (`CLL-Kernel_v1_2_1`, Micro/Standard) still ships the pre-v1.1 compression rules: a structural-consonant whitelist (two mutually inconsistent lists), UR length `3–6`/`4–10`, and no duplicate-collapse or subsequence rule. These are runtime regressions, not spec changes. They are migrated on the kernel side only when the per-provider regression suite is re-run (Model Compatibility Note, doc 05).
+**Retained from v1.2:**
+- §7 **AVR verb CM forms** MUST satisfy the Subsequence Conformance Rule (§6).
+- §8 **UR ↔ AVR namespace note** — some CM forms are shared between a dictionary
+  UR and an AVR verb; disambiguation is positional.
+
+> **Kernel Conformance Gap (informative).** The synthesized runtime kernel still
+> ships the pre-v1.1 compression rules (structural-consonant whitelist, UR length
+> `3–6`/`4–10`, no duplicate-collapse or subsequence rule). These are runtime
+> regressions, not spec changes, and migrate only when the per-provider
+> regression suite is re-run (Model Compatibility Note, doc 05).
 
 ## 1. Purpose
 
@@ -134,13 +142,12 @@ Every CM in the canonical dictionary MUST:
 This rule is machine-checkable and is the basis of the dictionary
 conformance test in `test_suite.py`.
 
-## 7. AVR Verb CM Conformance (New in v1.2)
+## 7. AVR Verb CM Conformance
 
 The Action Verb Registry (doc 07) supplies the verbs allowed in the
 `Act:` line. Each AVR verb has a registered CM form. AVR CM forms are
 **registered**, not derived inline, but every one of them MUST satisfy
-the Subsequence Conformance Rule (§6) so that the same machine check
-covers both registries.
+the Subsequence Conformance Rule (§6).
 
 Worked check for the 14 core AVR verbs (verb → CM → ordered subsequence?):
 
@@ -166,7 +173,7 @@ Executable
 All 14 conform. New AVR verbs added under doc 07's extension policy MUST
 pass this same check before approval.
 
-## 8. UR ↔ AVR Namespace Note (New in v1.2)
+## 8. UR ↔ AVR Namespace Note
 
 Two registries can produce the same CM string:
 
@@ -177,7 +184,7 @@ This is not a collision to resolve; it is intended reuse across two
 positional roles. Disambiguation is **positional**:
 
 - The **second token of an `Act:` line** is interpreted as an **AVR verb**.
-- The same string in any other position (`Int`/`Ctx`/`Cfg` roots, or the SCUR root of the `Act:` line's first token) is interpreted as a **UR**.
+- The same string in any other position is interpreted as a **UR**.
 
 Validators MUST apply this positional rule and MUST NOT flag the shared
 CM as a duplicate.

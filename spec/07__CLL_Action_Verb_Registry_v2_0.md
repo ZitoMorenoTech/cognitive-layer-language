@@ -1,8 +1,11 @@
-# CLL — Action Verb Registry (AVR) v1.2
+# CLL — Action Verb Registry (AVR) v2.0
 **Cognitive Layer Language — Registered Verbs for the Act Layer**
 
 > Normative values: this corpus (single source of truth); `cll_norms.json` planned.
-> New document (v1.2): formalizes a registry that previously existed only in the runtime kernel.
+
+**Version note (v1.2 → v2.0):** version aligned to the v2.0 corpus. **No registry
+change.** The `***Global***` container (Grammar v2.0 §5.8) does not affect the
+`Act:` line or its verbs. This is a header-aligned reissue.
 
 ## 1. Purpose
 
@@ -16,7 +19,7 @@ governs whether an `Out-Lang`/`Out` line is required.
 Format: `Verb | CM | Definition | BlockType | State`
 
 - **Verb:** Standard-mode form used in `Act:` lines (Standard Mode).
-- **CM:** Compact-mode form used in `Act:` lines (Compact Mode). Registered; MUST satisfy the Subsequence Conformance Rule (Algorithm v1.2, §6–§7).
+- **CM:** Compact-mode form used in `Act:` lines (Compact Mode). Registered; MUST satisfy the Subsequence Conformance Rule (Algorithm v2.0, §6–§7).
 - **BlockType:** `Dcl` (Declarative) or `Exc` (Executable).
 - **State:** `Proposed → Approved → Deprecated → Removed`.
 
@@ -62,7 +65,7 @@ Format: `Verb | CM | Definition | BlockType | State`
 Some CM forms are shared with dictionary URs: `Smr` (verb `Summarize` / UR
 `Summar`), `Vld` (verb `Validate` / UR `Validate`). This is intended reuse,
 not a collision. Disambiguation is positional: the second `Act:` token is an
-AVR verb; the same string elsewhere is a UR (Algorithm v1.2, §8).
+AVR verb; the same string elsewhere is a UR (Algorithm v2.0, §8).
 
 ## 7. Extension Policy
 
@@ -76,12 +79,12 @@ A new domain verb MUST:
 ## 8. Conformance Check
 
 All 14 core verbs satisfy the Subsequence Conformance Rule; the worked
-check is in UR→CM Algorithm v1.2, §7.
+check is in UR→CM Algorithm v2.0, §7.
 
 > **Kernel Conformance Gap (informative).** The runtime kernel embeds this
-> registry with the same 14 verbs. When the kernel migrates to the v1.2
-> corpus lengths/dictionary, re-verify that `cll_validator.py`'s hard-coded
-> AVR list matches this table (it drives V5).
+> registry with the same 14 verbs. When the kernel migrates to the v2.0
+> corpus, re-verify that `cll_validator.py`'s hard-coded AVR list matches this
+> table (it drives V5).
 
 ---
-*End of CLL Action Verb Registry v1.2*
+*End of CLL Action Verb Registry v2.0*

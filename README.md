@@ -36,7 +36,7 @@ The unit is a **block**: five layers, always the same, always in order.
 | `Out-Lang:` | **Deliver** in what form? |
 
 ```cll
-CLL: 1.2
+CLL: 2.0
 Int: A-Analys Kontext
 Ctx: D-Data UserReq
 Cfg: C-Konfig Tone:Neutral Len:Short
@@ -50,10 +50,12 @@ Blocks are packaged into a **CoS** (Cognitive Operating System) — META for the
 
 ```cll
 # META
-Ver: 1.2 Dom:Doc Auth:Zito Date:2026-09
+Ver: 2.0 Dom:Doc Auth:Zito Date:2026-09
 
 # GLOBAL
+***Global***
 Var: OutLang = "es"
+***End Global***
 
 Int: A-Analys SourceScope
 Ctx: D-Data InputOnly
@@ -68,15 +70,17 @@ Act: X-Exec Build
 Out-Lang: Natural
 ```
 
-Two mechanisms sit on top: the **Global Variable System** — declare a value once with `Var:`, reference it with `$Name` — and **Literal Preservation**, where content wrapped in `***Literal***` markers passes through byte-for-byte with the grammar switched off.
+Two mechanisms sit on top. The **Global Variable System**: declare shared values once inside the `***Global***` container and reference them with `$Name`. You can write them formally (`Var: OutLang = "es"`) **or** just describe them in plain words inside the container and let the model resolve them into variables — so a user who doesn't know CLL can still set up a CoS. And **Literal Preservation**: content wrapped in `***Literal***` markers passes through byte-for-byte with the grammar switched off. The two containers are siblings — neither nests inside the other.
 
-Full specification in [`/spec`](./spec). Start with the [Overview & Reading Guide](./spec/00__CLL_Overview_and_Reading_Guide_v1_2.md).
+Full specification in [`/spec`](./spec). Start with the [Overview & Reading Guide](./spec/00__CLL_Overview_and_Reading_Guide_v2_0.md).
 
 ---
 
 ## What the benchmark shows
 
 Twelve runs across five domains (book card, recipe extraction, technical article, option comparison, translation), executed via API in cold-call mode with no conversational context. Conformity is measured on two independent axes: **structure** (was the form respected?) and **context** (was the content and its constraints respected?).
+
+> The benchmark below was measured on the v1.2 design. The v2.0 change is how the GLOBAL section is delimited (an explicit `***Global***` container), not how variables behave, so these findings remain representative. The one genuinely new v2.0 capability — natural-mode resolution — is not yet benchmarked (see below).
 
 **Design phase — seven findings, each isolating one variable:**
 
@@ -101,7 +105,8 @@ Full evidence — inputs, CoS, raw outputs and rule-by-rule scoring — in [`/lo
 - **Small sample.** Three inputs per domain. Enough for design exploration, not for statistical significance.
 - **The conditional map has only its two extremes measured** against a control. Three domains in the middle are missing.
 - **Variance is measured in a single domain.** The low CV still needs confirming where CLL contributes most.
-- **Claims are model-generation specific.** A result measured on one generation is a historical fact, not a present guarantee ([doc 05](./spec/05__CLL_Model_Compatibility_Note_v1_1.md)).
+- **Natural-mode `***Global***` resolution is unmeasured.** The v2.0 natural-language container mode depends on the executing model and has not been benchmarked; its accuracy is treated as unverified until the regression suite runs ([doc 05](./spec/05__CLL_Model_Compatibility_Note_v2_0.md)).
+- **Claims are model-generation specific.** A result measured on one generation is a historical fact, not a present guarantee ([doc 05](./spec/05__CLL_Model_Compatibility_Note_v2_0.md)).
 
 No token-savings percentage is claimed. The specification prohibits asserting one without per-tokenizer measurement, and that measurement has not been done.
 
@@ -109,7 +114,7 @@ No token-savings percentage is claimed. The specification prohibits asserting on
 
 ## Repository structure
 ```
-/spec The CLL v1.2 corpus — 12 documents, the source of truth
+/spec The CLL v2.0 corpus — 12 documents, the source of truth
 /logs Development logs 001–007 with the full benchmark evidence
 /examples Working CoS examples with their inputs and outputs
 ```
@@ -119,7 +124,11 @@ The **compiler and validator are not in this repository.** They live in a separa
 
 ## Status
 
-The corpus is at **v1.2** and stable, and it will keep moving — the specification advances as the benchmark produces evidence. Open design questions are marked inside the documents rather than hidden. One is currently open: how the GLOBAL section should recognize variable declarations (positional enforcement vs. an explicit container). It surfaced during testing and is recorded in the Grammar.
+The corpus is at **v2.0** and stable, and it will keep moving — the specification advances as the benchmark produces evidence. Open design questions are marked inside the documents rather than hidden.
+
+The one question that was open in v1.2 — how the GLOBAL section should recognize variable declarations (positional enforcement vs. an explicit container) — is **resolved in v2.0**: the GLOBAL section is now the explicit `***Global***` container, consistent with the existing `***Literal***` container, with two authoring modes (formal `Var:` lines, or natural language resolved to variables before execution).
+
+The **runtime** (compiler and validator, in the private repo) is pinned at `v1.2.1-runtime` and adopts the v2.0 container only when the per-provider regression suite is re-run. The corpus and the runtime are decoupled on purpose; the delta is tracked as a **Kernel Conformance Gap** inside the spec documents.
 
 ---
 

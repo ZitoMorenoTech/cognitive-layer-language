@@ -1,9 +1,13 @@
-# CLL — Overview & Reading Guide v1.2
+# CLL — Overview & Reading Guide v2.0
 **Start here. Plain-language map of the whole corpus.**
 
 > This document is the on-ramp, not the law. It names the main ideas simply
 > and points to where each one is defined precisely. When this guide and a
 > spec document disagree, the spec document wins.
+
+**Version note (v1.2 → v2.0):** updated for the `***Global***` container. §4 and
+the worked example in §5 now use the container (the old positional `# GLOBAL`
+form is invalid under v2.0).
 
 ---
 
@@ -61,14 +65,22 @@ You rarely ship one block. You ship a **CoS** — a small document that groups
 blocks. It has three parts, like a recipe card:
 
 1. **META** — the label: version, domain, author, date. (`# META`)
-2. **GLOBAL** — the pantry rules that apply to everything: shared values and
-   whole-CoS rules. (`# GLOBAL`)
+2. **GLOBAL** — the pantry: shared values that apply to everything, wrapped in
+   the `***Global***` container.
 3. **MODULES** — the actual steps, one or more blocks.
 
 Two helpers live here:
 
-- **Variables (GVS)** — declare a value once, reuse it: `Var: OutLang = "es"` then `$OutLang`. (doc 09)
-- **Literal Preservation** — when you need content kept **exactly** (a template, some code), wrap it in `***Literal***` … `***End Literal***`. Inside those markers, the rules switch off and the text passes through verbatim. (doc 06)
+- **Variables (GVS)** — declare a value once inside `***Global***`, reuse it
+  everywhere. You can write them formally (`Var: OutLang = "es"`) **or** just
+  describe them in plain words inside the container and let the model turn them
+  into `Var:` lines. Then reference with `$OutLang`. (doc 09)
+- **Literal Preservation** — when you need content kept **exactly** (a template,
+  some code), wrap it in `***Literal***` … `***End Literal***`. Inside those
+  markers, the rules switch off and the text passes through verbatim. (doc 06)
+
+Note the two containers are **siblings**: `***Global***` for shared values,
+`***Literal***` for verbatim content. Neither goes inside the other.
 
 ---
 
@@ -76,10 +88,12 @@ Two helpers live here:
 
 ```
 # META
-Ver: 1.2 Dom:Doc Auth:Zito Date:2026-09       ← the label
+Ver: 2.0 Dom:Doc Auth:Zito Date:2026-09        ← the label
 
 # GLOBAL
+***Global***
 Var: OutLang = "es"                            ← a value reused everywhere
+***End Global***
 
 Int: A-Analys SourceScope                      ← a GLOBAL RULE (declarative):
 Ctx: D-Data InputOnly                            "only use the input,
@@ -94,10 +108,20 @@ Act: X-Exec Build                              ← Build = produces output
 Out-Lang: Natural
 ```
 
-Read top to bottom: *this is a v1.2 Doc-domain CoS; output language is Spanish;
-a standing rule says use only the input; then build a 7-field book card from
-the user's text, in the global language.* No prose, no ambiguity, same result
-each run.
+Read top to bottom: *this is a v2.0 Doc-domain CoS; output language is Spanish
+(declared once in the `***Global***` container); a standing rule says use only
+the input; then build a 7-field book card from the user's text, in the global
+language.* No prose, no ambiguity, same result each run.
+
+The same CoS in **natural mode** — the values described in plain words, resolved
+to `Var:` before the modules run:
+
+```
+# GLOBAL
+***Global***
+El idioma de salida siempre es español.
+***End Global***
+```
 
 ---
 
@@ -115,7 +139,7 @@ You don't have to read all 11 in order. Follow the thread:
 | 01_1 | UR→CM Algorithm | understand how roots compress | 01_2 |
 | 07 | Action Verb Registry | see which verbs are legal in `Act:` | 01 |
 | 08 | CoS Container & Inheritance | package blocks into a CoS / reuse a base | 02 |
-| 09 | Global Variable System | declare and reuse values | 08 |
+| 09 | Global Variable System | declare and reuse values (`***Global***`) | 08 |
 | 06 | Literal Preservation | keep content verbatim (templates, code) | 03 |
 | 04 | Style Guide | write clean, consistent CLL | all above |
 | 05 | Model Compatibility Note | understand claims, benchmarking, corpus↔kernel | — |
@@ -130,10 +154,12 @@ You don't have to read all 11 in order. Follow the thread:
   standard output), measured per model and per provider. Any flat "40–70%
   fewer tokens" line is not the spec — it's runtime drift (doc 05).
 - **Corpus vs kernel.** These documents (the *corpus*) are the source of
-  truth. The *kernel* that runs on the website is a separate synthesized
+  truth. The *kernel* that runs on the platform is a separate synthesized
   build. They are decoupled on purpose so documentation can improve without
   cascading into the running validator/compiler. Where they differ, a
   **Kernel Conformance Gap** box records it (docs 01_1, 01_2, 02, 07, 09).
+  The corpus is at **v2.0**; the runtime kernel is pinned at v1.2.1-runtime
+  until the per-provider regression suite is re-run.
 
 ---
 
@@ -146,9 +172,9 @@ You don't have to read all 11 in order. Follow the thread:
 - **SC** — the category letter before a root (`A-`, `D-`, `C-`, …).
 - **AVR** — the fixed list of allowed `Act:` verbs.
 - **Dcl / Exc** — a block that sets a rule / a block that makes output.
-- **GVS** — declare-once values (`Var:` / `$Name`).
+- **GVS** — declare-once values, in the `***Global***` container (`Var:` / `$Name`).
 - **LP** — verbatim capsules (`***Literal***`).
-- **Kernel** — the runtime build of CLL loaded on the website.
+- **Kernel** — the runtime build of CLL loaded on the platform.
 
 ---
-*End of CLL Overview & Reading Guide v1.2*
+*End of CLL Overview & Reading Guide v2.0*

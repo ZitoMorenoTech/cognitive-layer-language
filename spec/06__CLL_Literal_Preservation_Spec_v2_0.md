@@ -1,23 +1,26 @@
-# CLL — Literal Preservation (LP) Specification v1.2
+# CLL — Literal Preservation (LP) Specification v2.0
 **Cognitive Layer Language — Verbatim Content Capsules**
 
 > Normative values: this corpus (single source of truth); `cll_norms.json` planned.
-> Extends: CLL-Grammar v1.2 (§5.7), CLL-SPEC v1.2 (§5, §11)
+> Extends: CLL-Grammar v2.0 (§5.7), CLL-SPEC v2.0 (§5, §11)
 
-**Changes vs v1.0:**
-- **Marker syntax changed** from a single `***…***` pair to **named markers** `***Literal***` … `***End Literal***` (aligns with the runtime kernel and the validator V11/V12).
-- **Governance added:** every Literal block MUST be immediately preceded by a governing CLL block whose `Cfg:` line contains `Format:Literal` (validator V11).
-- Marker lines MUST stand alone (no inline content).
-- Byte-for-byte guarantee clarified against internal transport compression (§3).
-- Provisional code `VG17` folded into the V11/V12 family (§6).
+**Version note (v1.2 → v2.0):** the LP mechanism itself is **unchanged**. The
+version is aligned to the v2.0 corpus, and §7 is added to state how LP relates to
+the new sibling container, `***Global***` (Grammar v2.0, §5.8).
+
+**Changes vs v1.2:**
+- §7 added — relationship to the `***Global***` container: the two are **sibling
+  containers**, never nested in each other.
+- Version aligned to v2.0. No change to markers, governance, semantics or
+  validator codes (V11/V12).
 
 ## 1. Purpose
 
 Literal Preservation (LP) lets a CoS carry content that the pipeline and
 the receiving LLM MUST treat VERBATIM: output templates, exact-format
 skeletons, placeholder structures (`{titulo}`, `{fecha}`), and embedded
-non-CLL DSLs (Power Query M, SQL, regex). LP is the single sanctioned
-exception to CLL strictness: inside the markers, the grammar does not apply.
+non-CLL DSLs (Power Query M, SQL, regex). LP is a sanctioned exception to CLL
+strictness: inside the markers, the grammar does not apply.
 
 ## 2. Syntax
 
@@ -68,7 +71,7 @@ literal would defeat its purpose.
 
 - **4.1** A Literal block MUST be immediately preceded by a governing CLL block whose `Cfg:` line contains `Format:Literal` (validator **V11**). A Literal block with no governing block, or a governing block missing `Format:Literal`, makes the CoS INVALID.
 - **4.2** The governing block typically uses a Declarative verb; `Preserve` (`Prs`) is the recommended default. Any Declarative verb (`Def`, `Enf`, `Prs`, `Apl`, `Stb`, `Fnl`) is acceptable.
-- **4.3** Multi-line literals are the ONLY construct exempt from the multi-line prohibition (SPEC §5.2). The exemption is safe because the body is opaque to the parser.
+- **4.3** Multi-line literals are exempt from the multi-line prohibition (SPEC §5.2). The exemption is safe because the body is opaque to the parser.
 - **4.4** **Nesting is prohibited** (validator **V12**): `***Literal***` cannot appear inside a `<LiteralBody>`.
 - **4.5** Markers MUST be balanced. An unbalanced marker count is a validation error in the V11/V12 family.
 - **4.6** During structural validation, processors replace each literal with an opaque placeholder, validate the masked CoS, then restore. The placeholder participates in grammar as a FlagToken.
@@ -98,8 +101,25 @@ the surrounding CoS; the literal payload itself is mode-agnostic.
 
 - **V11** (Critical): a Literal block lacks a governing CLL block with `Format:Literal` in `Cfg`.
 - **V12** (Critical): nested `***Literal***` markers.
-- Unbalanced markers map to the V11/V12 family (former provisional `VG17`, now retired).
+- Unbalanced markers map to the V11/V12 family.
 - **W-LP** (optional): literal longer than a configurable size threshold (advisory only; never blocks).
 
+## 7. Relationship to the Global Container (New in v2.0)
+
+CLL v2.0 introduces a second marker-delimited container, `***Global***` (Grammar
+v2.0, §5.8), for the GLOBAL section. The two are **sibling containers**, not
+composable:
+
+- A `***Literal***` block MUST NOT appear inside a `***Global***` block, and a
+  `***Global***` block MUST NOT appear inside a `***Literal***` block. Both are
+  covered by their respective no-nesting rules (V12 for Literal; V17 for Global).
+- They serve opposite purposes: Literal makes content **opaque and verbatim**
+  (the grammar switches off, nothing is interpreted); Global (formal mode) is
+  **fully structured** (`Var:` lines), and Global (natural mode) is **interpreted
+  and resolved** to `Var:` before execution — the reverse of verbatim.
+- A CoS may contain both: a `***Global***` container for its shared values and
+  one or more `***Literal***` blocks for its verbatim templates, each governed by
+  its own preceding CLL block.
+
 ---
-*End of CLL Literal Preservation Spec v1.2*
+*End of CLL Literal Preservation Spec v2.0*

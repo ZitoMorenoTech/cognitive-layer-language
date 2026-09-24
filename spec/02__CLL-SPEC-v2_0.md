@@ -1,18 +1,31 @@
-# CLL-SPEC v1.2 (Technical Specification)
+# CLL-SPEC v2.0 (Technical Specification)
 **Cognitive Layer Language – Formal Standard**
 
 > Normative values are listed inline in this corpus (single source of truth).
 > A machine-readable `cll_norms.json` extract is planned for tooling (Roadmap).
 
-**Changes vs v1.1:**
-- `V-` (Validation) added to the reserved prefixes → nine SC (§2).
-- `Var` added to the line-key set; custom/unregistered line keys prohibited (§5, V13).
-- Block Type rules formalized (§4a) and the Action Verb Registry made normative for `Act:` verbs (§4a → doc 07).
-- TypedValue parameters (`>20%`, `10-20x`) admitted (§5.3 → Grammar §5.2).
-- CoS Container, GVS and Literal Preservation referenced (§11 → docs 08 / 09 / 06).
-- §9 (Convergence Efficiency + mandatory measurement constraints) retained from v1.1; the runtime kernel's flat "40–70%" claim is recorded as drift.
+**Version note (v1.2 → v2.0):** major release. The GLOBAL section is now an
+explicit `***Global***` container (§11a → Grammar v2.0 §5.8, doc 09), and
+declaring globals outside it is INVALID (V17, now Critical). This break is what
+makes v2.0 major; existing v1.x CoS require migration.
 
-> **Kernel Conformance Gap (informative).** The synthesized runtime kernel diverges from this SPEC on machine-relevant points: UR length `3–6`/`4–10` (spec: 3–13 / CM 2–4), structural-consonant whitelist (spec: removed), `Rating|Rtg` present (spec: rejected), and a flat "40–70% fewer tokens" claim in its §12 (spec §9: prohibited without per-tokenizer measurement). These are migrated on the kernel side only when the per-provider regression suite is re-run (doc 05).
+**Changes vs v1.2:**
+- **`***Global***` container made normative** for the GLOBAL section (§5.4, §11a).
+  Two authoring modes: formal (`Var:`) and natural (free text resolved before
+  execution).
+- **V17 re-purposed and promoted** from a positional Warning to a container-
+  integrity **Critical** check: ≤1 `***Global***` per CoS, and every `Var:`
+  inside it.
+- All v1.2 rules otherwise retained: `V-` prefix (nine SC), closed line-key set
+  incl. `Var`, Block Type rules + AVR, TypedValues, Literal Preservation.
+- §9 (Convergence Efficiency + mandatory measurement constraints) retained; the
+  runtime kernel's flat "40–70%" claim remains recorded as drift.
+
+> **Kernel Conformance Gap (informative).** In addition to the v1.2 gap items
+> (UR length, consonant whitelist, `Rating` removal, canonical Validate names),
+> v2.0 adds the `***Global***` container and natural-mode resolution, absent from
+> the runtime kernel. These migrate on the kernel side only when the per-provider
+> regression suite is re-run (doc 05).
 
 ## 1. SPEC Purpose
 
@@ -73,7 +86,7 @@ Rules:
 - No layer may be omitted in Standard Mode, except `Out-Lang`/`Out` for Declarative blocks.
 - Layers appear exactly once. No blank lines inside the block.
 
-## 4a. Block Type Rules (New in v1.2)
+## 4a. Block Type Rules
 
 Every block MUST be classifiable as Declarative or Executable, determined
 by the verb in the `Act:` line:
@@ -92,16 +105,25 @@ Line keys form a **closed set**: `Int`, `Ctx`, `Cfg`, `Act`, `Out-Lang`, `Out`, 
 
 **5.2 Prohibited:** natural connectors (and/but/also) outside quotes,
 conjugated verbs, narrative sentences, multi-line values (except inside
-Literal blocks), free-form prose, digits inside UR/CM roots, numeric
-collision suffixes, nested Literal blocks, Literal markers without a
-governing `Format:Literal` block, and **custom/unregistered line keys**
-(`R:`, `Note:`, `Rule:`, `Rationale:`, `Comment:`, `Why:`, `Because:`,
-`Reason:`, `Detail:`, `Info:`, …) — only the seven keys in §5.1 are valid (V13).
+Literal blocks and natural-mode Global blocks), free-form prose, digits inside
+UR/CM roots, numeric collision suffixes, nested Literal or Global blocks,
+Literal markers without a governing `Format:Literal` block, `Var:` declarations
+outside the `***Global***` container, more than one `***Global***` block, and
+**custom/unregistered line keys** (`R:`, `Note:`, `Rule:`, `Rationale:`,
+`Comment:`, `Why:`, `Because:`, `Reason:`, `Detail:`, `Info:`, …) — only the
+seven keys in §5.1 are valid (V13).
 
 **5.3 Allowed:** quoted strings (with `\"` escaping), `Key:Value` pairs,
 TypedValues (`ARRThr:>20%`, `EVRange:10-20x`), compact flags,
-`$VarName` references, domain-specific tokens, and Literal blocks marked
-by `***Literal***`/`***End Literal***` when governed by a `Format:Literal` block.
+`$VarName` references, domain-specific tokens, Literal blocks marked
+by `***Literal***`/`***End Literal***` when governed by a `Format:Literal` block,
+and the `***Global***` container for the GLOBAL section.
+
+**5.4 GLOBAL section (New in v2.0).** Global variables are declared inside the
+`***Global***` … `***End Global***` container (Grammar v2.0 §5.8). The container
+appears at most once, may sit anywhere after META, and holds either `Var:` lines
+(formal mode) or natural-language text resolved to `Var:` before execution
+(natural mode). A `Var:` line outside the container is INVALID (V17).
 
 ## 6. Compact Mode (CM)
 
@@ -110,6 +132,7 @@ by `***Literal***`/`***End Literal***` when governed by a `Format:Literal` block
 **6.2** Layer changes: `Out-Lang` → `Out`. Parameters shortened
 (`Tone` → `Tn`, `Length` → `Ln`, `Domain` → `Dom`). Line keys never compress.
 `Format:Literal` does not compress. `$VarName` references do not compress.
+The `***Global***` / `***Literal***` markers do not compress.
 
 **6.3** Example:
 
@@ -126,9 +149,12 @@ Out: Nat
 ### 7.1 Valid
 
 ```cll
-CLL: 1.2
+CLL: 2.0
+***Global***
+Var: Threshold = 20
+***End Global***
 Int: A-Analys Kontext
-Ctx: D-Data UserReq
+Ctx: D-Data UserReq Thr:$Threshold
 Cfg: C-Konfig Tone:Neutral Len:Short
 Act: X-Exec Build
 Out-Lang: Natural
@@ -141,6 +167,7 @@ Int: I want you to analyze this      <- narrative sentence
 Ctx: because the user said so        <- connector, prose
 Act: X-Rte2 Build                    <- digit in root
 R: extra reasoning line              <- custom line key (V13)
+Var: Threshold = 20                  <- Var: outside ***Global*** (V17)
 ```
 
 ## 8. Domain Extensions
@@ -154,7 +181,7 @@ Rules:
 - Domain actions MUST be registered in the AVR (doc 07).
 - Extension tokens MUST be declared in a domain registry so validators
   can distinguish legitimate domain tokens from typos.
-  *(Registry grammar: planned for v1.3 — see Roadmap, Track A.)*
+  *(Registry grammar: planned for a later release — see Roadmap, Track A.)*
 
 ## 9. Efficiency Principles
 
@@ -188,12 +215,21 @@ Clarity over length. Precision over aesthetics. Universality over
 localism. Stability over variation. Semantics over syntax. Cognitive
 determinism over stylistic freedom. Measured claims over assumed claims.
 
-## 11. CoS Container, Variables, Literals (New in v1.2)
+## 11. CoS Container, Variables, Literals
 
 - **CoS Container** (META / GLOBAL / MODULES, inheritance): doc 08.
-- **Global Variable System** (`Var:` / `$Ref`): doc 09.
+- **Global Variable System** (`***Global***`, `Var:` / `$Ref`): doc 09.
 - **Literal Preservation** (`***Literal***`, `Format:Literal`): doc 06.
-- **Validation schema** (V1–V13 critical, V14–V18 extended): CLL Validator v1.2.1.
+- **Validation schema** (V1–V13 + V17 critical, V14–V16 + V18 extended): CLL Validator v2.0.
+
+## 11a. GLOBAL Container (New in v2.0)
+
+The GLOBAL section is delimited by `***Global***` … `***End Global***`:
+
+- At most one container per CoS; position free after META.
+- Formal mode: `Var:` lines. Natural mode: free text resolved to `Var:` by the
+  executing model before the modules run (Compiler spec; safety net is V8).
+- Every global `Var:` MUST be inside the container (V17, Critical).
 
 ---
-*End of CLL-SPEC v1.2*
+*End of CLL-SPEC v2.0*
